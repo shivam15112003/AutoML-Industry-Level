@@ -19,16 +19,7 @@ The complete methodology, detailing the workflow and processes used in this proj
 ## 📂 Project Structure
 ```
 ├── main.py                # Main script for AutoML pipeline
-├── data/                  # Dataset directory
-│   ├── industry_data.csv  # Industry-level dataset
-├── models/                # Trained models & encoders
-│   ├── best_model.pkl     # Best performing model
-│   ├── encoders.pkl       # Encoders for categorical features
-│   ├── scaler.pkl         # Scaler for feature normalization
-├── reports/               # Analysis & visualization reports
-│   ├── shap_summary.png   # SHAP explainability plot
-│   ├── feature_importance.csv  # Feature importance report
-├── predictions.xlsx       # Sample predictions
+├── industry_data.csv  # Industry-level dataset
 ├── requirements.txt       # Dependencies
 ├── README.md              # Project documentation
 ├── METHODOLOGY.md         # Detailed methodology
