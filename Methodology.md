@@ -34,10 +34,6 @@
 - Uses **SHAP (SHapley Additive Explanations)** to interpret model decisions and generate feature importance plots.
 - Saves **SHAP summary visualization** to highlight influential features.
 
-## 7️⃣ Model Deployment & Predictions
-- Saves the **best model** as `best_model.pkl` for future use.
-- Generates predictions on test data and exports them to an **Excel file (`predictions.xlsx`)**.
-- Saves **feature importance analysis** as `feature_importance.csv`.
 
 ---
 This methodology ensures **maximum automation, scalability, and accuracy** for enterprise-level machine learning workflows.
