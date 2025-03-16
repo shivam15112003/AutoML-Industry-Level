@@ -35,11 +35,6 @@ pip install -r requirements.txt
 python main.py
 ```
 
-## 📊 Outputs
-- `models/best_model.pkl` → Trained Model
-- `reports/shap_summary.png` → SHAP Explainability Plot
-- `reports/feature_importance.csv` → Feature Importance Analysis
-- `predictions.xlsx` → Predictions on sample data
 
 
 
