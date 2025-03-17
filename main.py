@@ -10,17 +10,25 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, KFold
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, GradientBoostingRegressor
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.preprocessing import StandardScaler, LabelEncoder, PolynomialFeatures
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, GradientBoostingRegressor, ExtraTreesClassifier, ExtraTreesRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.svm import SVC, SVR
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.decomposition import PCA
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.metrics import accuracy_score, mean_squared_error, f1_score, silhouette_score
 from imblearn.over_sampling import SMOTE
 from xgboost import XGBClassifier, XGBRegressor
 from catboost import CatBoostClassifier, CatBoostRegressor
 from lightgbm import LGBMClassifier, LGBMRegressor
 from sklearn.inspection import permutation_importance
+
+# Reinforcement Learning Imports
+import gym
+from stable_baselines3 import PPO, DQN, A2C
 
 # Setup Logging
 logging.basicConfig(filename="logs/automl.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -50,7 +58,8 @@ def preprocess_data(df):
 
 df = preprocess_data(df)
 
-target_column = "Purchased"  # Update as per dataset
+# Detect Task Type
+target_column = "Purchased"  # Change as per dataset
 task_type = "classification" if df[target_column].nunique() <= 10 else "regression"
 logging.info(f"Detected Task Type: {task_type.upper()}")
 
@@ -70,9 +79,12 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 joblib.dump(scaler, "models/scaler.pkl")
 
-# Convert scaled data back to DataFrame
-X_train_df = pd.DataFrame(X_train_scaled, columns=X.columns)
-X_test_df = pd.DataFrame(X_test_scaled, columns=X.columns)
+# Feature Selection using Permutation Importance
+def select_features(model, X_train, y_train):
+    model.fit(X_train, y_train)
+    result = permutation_importance(model, X_train, y_train, n_repeats=10, random_state=42)
+    important_features = X.columns[np.argsort(result.importances_mean)[-10:]]  # Top 10 features
+    return important_features
 
 # Define Models
 models = {
@@ -82,8 +94,13 @@ models = {
     "CatBoost": CatBoostClassifier(verbose=0) if task_type == "classification" else CatBoostRegressor(verbose=0),
     "GradientBoosting": GradientBoostingClassifier() if task_type == "classification" else GradientBoostingRegressor(),
     "LogisticRegression": LogisticRegression() if task_type == "classification" else None,
-    "DecisionTree": DecisionTreeClassifier() if task_type == "classification" else DecisionTreeClassifier(),
-    "NeuralNetwork": MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500) if task_type == "classification" else None
+    "LinearRegression": None if task_type == "classification" else LinearRegression(),
+    "PolynomialRegression": None if task_type == "classification" else PolynomialFeatures(degree=2),
+    "DecisionTree": DecisionTreeClassifier() if task_type == "classification" else DecisionTreeRegressor(),
+    "NaïveBayes_Gaussian": GaussianNB() if task_type == "classification" else None,
+    "KMeans": KMeans(n_clusters=3) if task_type == "unsupervised" else None,
+    "DBSCAN": DBSCAN() if task_type == "unsupervised" else None,
+    "PCA": PCA(n_components=2) if task_type == "unsupervised" else None,
 }
 
 # Model Evaluation with Cross-Validation
@@ -100,59 +117,38 @@ for name, model in models.items():
             best_score = mean_score
             best_model = model
 
-logging.info(f"Best Model Selected: {best_model.__class__.__name__} with Score: {best_score:.2f}%")
+logging.info(f"Best Model Selected: {best_model._class.name_} with Score: {best_score:.2f}%")
 
 # Hyperparameter Optimization
-if best_score < 98:
-    logging.info("Performing Hyperparameter Optimization...")
+def objective(trial):
+    params = {
+        "n_estimators": trial.suggest_int("n_estimators", 50, 300),
+        "max_depth": trial.suggest_int("max_depth", 3, 20),
+        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.5)
+    }
+    model = XGBClassifier(*params) if task_type == "classification" else XGBRegressor(*params)
+    model.fit(X_train_scaled, y_train)
+    preds = model.predict(X_test_scaled)
+    return accuracy_score(y_test, preds) if task_type == "classification" else -mean_squared_error(y_test, preds)
 
-    def objective(trial):
-        params = {
-            "n_estimators": trial.suggest_int("n_estimators", 50, 300),
-            "max_depth": trial.suggest_int("max_depth", 3, 20),
-            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.5)
-        }
-        model = XGBClassifier(**params) if task_type == "classification" else XGBRegressor(**params)
-        model.fit(X_train_scaled, y_train)
-        preds = model.predict(X_test_scaled)
-        return accuracy_score(y_test, preds) if task_type == "classification" else -mean_squared_error(y_test, preds)
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=20)
+best_params = study.best_params
 
-    study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=20)
-    best_params = study.best_params
+with open("models/best_params.json", "w") as f:
+    json.dump(best_params, f)
 
-    with open("models/best_params.json", "w") as f:
-        json.dump(best_params, f)
-
-    best_model = XGBClassifier(**best_params) if task_type == "classification" else XGBRegressor(**best_params)
-    best_model.fit(X_train_scaled, y_train)
-
-    best_score = accuracy_score(y_test, best_model.predict(X_test_scaled)) if task_type == "classification" else 1 - mean_squared_error(y_test, best_model.predict(X_test_scaled))
-    logging.info(f"Optimized Model Score: {best_score:.2f}%")
-
-# Save the Best Model
+best_model = XGBClassifier(*best_params) if task_type == "classification" else XGBRegressor(*best_params)
+best_model.fit(X_train_scaled, y_train)
 joblib.dump(best_model, "models/best_model.pkl")
 
-# Feature Importance Analysis
-if hasattr(best_model, "feature_importances_"):
-    feature_importance = pd.DataFrame({"Feature": X.columns, "Importance": best_model.feature_importances_})
-    feature_importance.sort_values(by="Importance", ascending=False).to_csv("reports/feature_importance.csv", index=False)
+# Train Reinforcement Learning Agent
+env = gym.make("CartPole-v1")
+agent = PPO("MlpPolicy", env, verbose=1)
+agent.learn(total_timesteps=10000)
+agent.save("models/reinforcement_agent")
 
-# SHAP Explainability
-explainer = shap.Explainer(best_model)
-shap_values = explainer(X_test_df[:100])
-shap.summary_plot(shap_values, X_test_df[:100])
-plt.savefig("reports/shap_summary.png")
-
-# Save Sample Predictions
-sample = X_test_df[:10]
-predictions = best_model.predict(sample)
-results = pd.DataFrame(sample, columns=X.columns)
-results["Prediction"] = predictions
-results.to_excel("reports/predictions.xlsx", index=False)
-print("\n✅ Predictions saved to 'predictions.xlsx'")
-
-logging.info("AutoML Pipeline Completed Successfully! 🚀")
+logging.info("Full AutoML System Completed! 🚀")
 
 
 
