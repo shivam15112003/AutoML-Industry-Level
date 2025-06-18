@@ -1,18 +1,11 @@
 pandas
 numpy
-joblib
-optuna
-shap
-seaborn
-matplotlib
 scikit-learn
-imblearn
+imbalanced-learn
 xgboost
-catboost
 lightgbm
+catboost
 tensorflow
-torch
-gym
-stable-baselines3
-stable-baselines3[extra] shimmy gymnasium
+optuna
+joblib
 
