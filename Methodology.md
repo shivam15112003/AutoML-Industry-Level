@@ -52,21 +52,13 @@
 * Searches optimal parameters to maximize model performance for each algorithm.
 * Provides efficient, scalable search without manual intervention.
 
-## 5️⃣ Model Explainability
-
-* Implements model interpretability via:
-
-  * **SHAP (SHapley Additive Explanations)** for detailed feature importance analysis.
-  * **Permutation Importance** for ranking feature relevance.
-* Generates interpretable visualizations saved in the reports directory.
-
-## 6️⃣ Model Saving & Deployment
+## 5️⃣ Model Saving & Deployment
 
 * The final best model is saved automatically in the `models/` directory.
 * Fully ready for deployment in production pipelines.
 * Supports integration with cloud platforms, Docker, or Kubernetes.
 
-## 7️⃣ Reporting & Monitoring
+## 6️⃣ Reporting & Monitoring
 
 * Generates detailed reports in `reports/` directory including:
 
