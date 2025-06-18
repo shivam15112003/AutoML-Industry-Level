@@ -1,53 +1,129 @@
-# 🚀 AutoML System
+# 🚀 AutoML Universal System
 
 ## 📌 Overview
-This cutting-edge **AutoML system** automates model selection, optimization, and deployment for **classification, regression, clustering, and reinforcement learning** tasks. It features **state-of-the-art preprocessing, hyperparameter tuning, explainability, and enterprise-grade deployment capabilities**.
+
+This **Universal AutoML System** automates model detection, preprocessing, feature engineering, hyperparameter optimization, and model training for **classification, regression, and clustering** tasks. It includes full support for **deep learning (DNN)**, advanced preprocessing, and robust evaluation.
 
 ## ✨ Features
-✅ **Automated Model Selection** – Chooses the best model based on accuracy, RMSE, or other evaluation criteria.  
-✅ **Hyperparameter Optimization** – Uses **Optuna** for highly efficient tuning.  
-✅ **Supervised Learning** – Supports **Random Forest, XGBoost, CatBoost, LightGBM, Logistic Regression, Decision Trees, Neural Networks, Naïve Bayes**, and more.  
-✅ **Unsupervised Learning** – Implements **K-Means, DBSCAN, PCA**, and other clustering techniques.  
-✅ **Reinforcement Learning** – Leverages **Stable-Baselines3 with Gym** for AI agent training.  
-✅ **Data Preprocessing** – Handles **missing values, categorical encoding, and feature scaling**.  
-✅ **Explainability & Feature Importance** – Utilizes **SHAP** and **Permutation Importance**.  
-✅ **Automated Deployment** – Supports **Docker, Kubernetes, and cloud deployment**.  
-✅ **Real-Time Monitoring** – Logs **model performance and data drift**.  
+
+✅ **Task Detection** – Automatically detects if the task is supervised (classification/regression) or unsupervised (clustering).
+✅ **Advanced Preprocessing** – Handles missing values, encodes categorical variables, removes outliers, scales features, and performs feature selection.
+✅ **Class Imbalance Handling** – Applies **SMOTE** for imbalanced classification tasks.
+✅ **Automated Model Selection** – Trains multiple models and selects the best one:
+
+* Random Forest
+* XGBoost
+* LightGBM
+* CatBoost
+* DNN (Deep Neural Network)
+  ✅ **Hyperparameter Optimization** – Uses **Optuna** for efficient hyperparameter tuning.
+  ✅ **Unsupervised Learning** – Includes **KMeans, DBSCAN, GMM, Agglomerative Clustering** with Silhouette score evaluation.
+  ✅ **Completely Modular** – Easy to modify, extend, and integrate additional models or tuning strategies.
 
 ## 🛠 Installation
-To install the required dependencies, run:
+
+Install the required dependencies:
+
 ```bash
-pip install -r requirements.txt
+pip install pandas numpy scikit-learn imbalanced-learn lightgbm xgboost catboost tensorflow optuna joblib
 ```
 
 ## 📊 Usage
-1️⃣ **Prepare Data** – Place your dataset in the `data/` directory.  
-2️⃣ **Run AutoML** – Execute:
-   ```bash
-   python automl.py
-   ```
-3️⃣ **View Results** – Check the `reports/` folder for **feature importance, SHAP values, and predictions**.  
-4️⃣ **Deploy Model** – The best model is saved in `models/best_model.pkl` for real-time inference.  
+
+### 1️⃣ Prepare Dataset
+
+* Provide your dataset as a CSV file.
+* If supervised learning, ensure the dataset includes a target column.
+
+### 2️⃣ Run AutoML
+
+* Run the script:
+
+```bash
+python main.py
+```
+
+* You will be prompted to enter:
+
+  * The dataset file path.
+  * The target column name (if supervised task).
+
+### 3️⃣ Output Files
+
+* Models saved in `models/`
+* Predictions saved in `reports/`
+* Scaler saved in `models/`
+
+## 🔎 Evaluation Metrics
+
+* **Classification**: Accuracy
+* **Regression**: Mean Squared Error
+* **Unsupervised (Clustering)**: Silhouette Score
 
 ## 📂 Project Structure
+
 ```
-📁 AutoML Project
-├── 📜 main.py              # Main script for the AutoML pipeline
-├── 📊 industry_data.csv    # Industry-level dataset
-├── 📦 requirements.txt     # Dependencies
-├── 📘 README.md            # Project documentation
-├── 📖 METHODOLOGY.md       # Detailed methodology
+📁 AutoML Universal System
+├── main.py           # Main AutoML script
+├── models/           # Saved models and scalers
+├── reports/          # Prediction outputs
+├── README.md         # Documentation
 ```
 
-## 📌 Notes
-- 📌 **Automatically detects** whether a task is **classification or regression**.  
-- 🔥 **Performs hyperparameter tuning** if accuracy is below **98%**.  
-- 🔄 **Supports both pre-trained models and training from scratch** based on feasibility.  
+## ⚠ Notes
 
-## 🤝 Contributing
-Feel free to contribute and enhance this **cutting-edge AutoML system**! 🚀💡
+* Fully automated from dataset ingestion to model saving.
+* Hyperparameter tuning is automatically invoked.
+* Easily expandable to include additional models, metrics, or deployment capabilities.
+
+---
+
+This system delivers **complete end-to-end AutoML automation** for both **supervised and unsupervised machine learning tasks**, including deep learning integration.
 
 
+
+# Universal AutoML System (Supervised & Unsupervised with DNN + Optuna)
+
+This is a fully automated Machine Learning system that supports both **supervised** and **unsupervised** learning.  
+It automatically performs:
+- Data preprocessing (imputation, encoding, outlier removal, scaling)
+- Feature selection
+- Hyperparameter tuning using **Optuna**
+- Traditional ML models (RandomForest, XGBoost, LightGBM, CatBoost)
+- Deep Neural Network (DNN) using **TensorFlow**
+- Unsupervised Clustering (KMeans, DBSCAN, GaussianMixture, Agglomerative)
+- Model comparison & automatic best model selection
+- Full reporting with model predictions and metrics
+
+---
+
+## Features
+
+✅ Fully automatic supervised classification/regression  
+✅ Fully automatic unsupervised clustering  
+✅ Hyperparameter optimization using Optuna  
+✅ Deep Learning (DNN) integration  
+✅ Full preprocessing pipeline  
+✅ Saves best models and reports automatically  
+✅ Minimal user input required
+
+---
+
+## Installation
+
+1️⃣ Clone this repository.
+
+```bash
+git clone https://github.com/your-repo/universal-automl.git
+cd universal-automl
+```bash
+2️⃣ Install dependencies:
+pip install -r requirements.txt
+Or if you're using conda:
+```bash
+conda create -n automl python=3.11
+conda activate automl
+pip install -r requirements.txt
 
 
 
